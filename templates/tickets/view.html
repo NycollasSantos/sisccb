@@ -1,0 +1,200 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>Chamado #{{ ticket.id }}</h1>
+    <div>
+        <a href="{{ url_for('tickets.list_tickets') }}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Voltar
+        </a>
+        <a href="{{ url_for('tickets.edit_ticket', ticket_id=ticket.id) }}" class="btn btn-warning">
+            <i class="fas fa-edit"></i> Editar
+        </a>
+        {% if ticket.status != 'fechado' %}
+        <a href="{{ url_for('tickets.close_ticket', ticket_id=ticket.id) }}" class="btn btn-dark">
+            <i class="fas fa-check"></i> Fechar
+        </a>
+        {% else %}
+        <a href="{{ url_for('tickets.reopen_ticket', ticket_id=ticket.id) }}" class="btn btn-success">
+            <i class="fas fa-redo"></i> Reabrir
+        </a>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Detalhes do Chamado -->
+<div class="card mb-4">
+    <div class="card-header bg-primary text-white">
+        <h5 class="mb-0">{{ ticket.title }}</h5>
+    </div>
+    <div class="card-body">
+        <div class="row mb-3">
+            <div class="col-md-3">
+                <strong>Status:</strong>
+                {% if ticket.status == 'aberto' %}
+                <span class="badge bg-danger">Aberto</span>
+                {% elif ticket.status == 'em_andamento' %}
+                <span class="badge bg-warning">Em Andamento</span>
+                {% elif ticket.status == 'resolvido' %}
+                <span class="badge bg-success">Resolvido</span>
+                {% elif ticket.status == 'fechado' %}
+                <span class="badge bg-secondary">Fechado</span>
+                {% endif %}
+            </div>
+            <div class="col-md-3">
+                <strong>Prioridade:</strong>
+                {% if ticket.priority == 'baixa' %}
+                <span class="badge bg-info">Baixa</span>
+                {% elif ticket.priority == 'média' %}
+                <span class="badge bg-warning">Média</span>
+                {% elif ticket.priority == 'alta' %}
+                <span class="badge bg-danger">Alta</span>
+                {% elif ticket.priority == 'crítica' %}
+                <span class="badge bg-dark">Crítica</span>
+                {% endif %}
+            </div>
+            <div class="col-md-3">
+                <strong>Categoria:</strong> {{ ticket.category }}
+            </div>
+            <div class="col-md-3">
+                <strong>Data de Criação:</strong> {{ ticket.created_at.strftime('%d/%m/%Y %H:%M') }}
+            </div>
+        </div>
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <strong>Criado por:</strong> {{ ticket.creator.name }}
+            </div>
+            <div class="col-md-6">
+                <strong>Atribuído para:</strong> 
+                {% if ticket.assigned_to %}
+                {{ ticket.assigned_to.name }}
+                {% else %}
+                <span class="text-muted">Não atribuído</span>
+                {% endif %}
+            </div>
+        </div>
+        <div class="row mb-3">
+            <div class="col-12">
+                <strong>Descrição:</strong>
+                <div class="mt-2 p-3 bg-light rounded">
+                    {{ ticket.description|nl2br }}
+                </div>
+            </div>
+        </div>
+        
+        {% if ticket.attachments %}
+        <div class="row mb-3">
+            <div class="col-12">
+                <strong>Anexos:</strong>
+                <ul class="list-group mt-2">
+                    {% for attachment in ticket.attachments %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <span>
+                            <i class="fas fa-paperclip"></i> {{ attachment.filename }}
+                        </span>
+                        <a href="{{ url_for('static', filename='uploads/' + attachment.filepath) }}" class="btn btn-sm btn-primary" target="_blank">
+                            <i class="fas fa-download"></i> Download
+                        </a>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Comentários (Chat) -->
+<div class="card mb-4">
+    <div class="card-header bg-success text-white">
+        <h5 class="mb-0">Comentários</h5>
+    </div>
+    <div class="card-body">
+        <div class="chat-container">
+            {% if comments %}
+                {% for comment in comments %}
+                <div class="chat-message {% if comment.user_id == current_user.id %}outgoing{% else %}incoming{% endif %}">
+                    <div class="message-bubble">
+                        <div class="message-info">
+                            <strong>{{ comment.author.name }}</strong>
+                            <small class="text-muted">{{ comment.created_at.strftime('%d/%m/%Y %H:%M') }}</small>
+                        </div>
+                        <div class="message-text">
+                            {{ comment.content|nl2br }}
+                        </div>
+                        {% if comment.attachments %}
+                        <div class="message-attachments">
+                            <strong>Anexos:</strong>
+                            <ul class="list-unstyled">
+                                {% for attachment in comment.attachments %}
+                                <li>
+                                    <a href="{{ url_for('static', filename='uploads/' + attachment.filepath) }}" target="_blank">
+                                        <i class="fas fa-paperclip"></i> {{ attachment.filename }}
+                                    </a>
+                                </li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="text-center text-muted py-3">
+                    Nenhum comentário ainda. Seja o primeiro a comentar.
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Formulário de Comentário -->
+{% if ticket.status != 'fechado' %}
+<div class="card">
+    <div class="card-header bg-primary text-white">
+        <h5 class="mb-0">Adicionar Comentário</h5>
+    </div>
+    <div class="card-body">
+        <form method="POST" action="{{ url_for('tickets.add_comment', ticket_id=ticket.id) }}" enctype="multipart/form-data">
+            {{ comment_form.hidden_tag() }}
+            <div class="mb-3">
+                {{ comment_form.content.label(class="form-label") }}
+                {% if comment_form.content.errors %}
+                    {{ comment_form.content(class="form-control is-invalid", rows=4) }}
+                    <div class="invalid-feedback">
+                        {% for error in comment_form.content.errors %}
+                            <span>{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    {{ comment_form.content(class="form-control", rows=4) }}
+                {% endif %}
+            </div>
+            <div class="mb-3">
+                {{ comment_form.attachments.label(class="form-label") }}
+                {{ comment_form.attachments(class="form-control") }}
+                <small class="text-muted">Você pode anexar múltiplos arquivos.</small>
+            </div>
+            <div class="d-grid">
+                {{ comment_form.submit(class="btn btn-primary") }}
+            </div>
+        </form>
+    </div>
+</div>
+{% else %}
+<div class="alert alert-warning">
+    Este chamado está fechado. Para adicionar mais comentários, reabra o chamado.
+</div>
+{% endif %}
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Rola a janela de chat para o último comentário
+    document.addEventListener('DOMContentLoaded', function() {
+        const chatContainer = document.querySelector('.chat-container');
+        if (chatContainer) {
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+    });
+</script>
+{% endblock %}

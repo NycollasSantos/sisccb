@@ -1,0 +1,56 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <a href="{{ url_for('knowledge_base.list_articles') }}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Voltar
+        </a>
+        <form class="d-flex mt-2" action="{{ url_for('knowledge_base.search_articles') }}" method="GET">
+            <input class="form-control me-2" type="search" name="q" placeholder="Pesquisar artigos..." value="{{ query }}" aria-label="Pesquisar">
+            <button class="btn btn-outline-primary" type="submit">Buscar</button>
+        </form>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header bg-primary text-white">
+        <h5 class="mb-0">Resultados da Pesquisa ({{ articles|length }} encontrados)</h5>
+    </div>
+    <div class="card-body">
+        {% if articles %}
+        <div class="row">
+            {% for article in articles %}
+            <div class="col-md-6 mb-4">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ article.title }}</h5>
+                        <h6 class="card-subtitle mb-2 text-muted">
+                            <span class="badge bg-info">{{ article.category }}</span>
+                            {% if article.tags %}
+                                {% for tag in article.tags.split(',') %}
+                                <span class="badge bg-secondary">{{ tag.strip() }}</span>
+                                {% endfor %}
+                            {% endif %}
+                        </h6>
+                        <p class="card-text">{{ article.content|truncate(150) }}</p>
+                    </div>
+                    <div class="card-footer d-flex justify-content-between align-items-center">
+                        <small class="text-muted">
+                            Por {{ article.author.name }} em {{ article.created_at.strftime('%d/%m/%Y') }}
+                        </small>
+                        <a href="{{ url_for('knowledge_base.view_article', article_id=article.id) }}" class="btn btn-sm btn-primary">
+                            Ler mais
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="alert alert-info">
+            Nenhum resultado encontrado para "{{ query }}". Tente usar termos diferentes.
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,126 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h2>Inventário de TI</h2>
+        </div>
+        <div class="col-md-4 text-end">
+            <a href="{{ url_for('inventory.new_equipment') }}" class="btn btn-primary me-2">
+                <i class="fas fa-plus"></i> Novo Equipamento
+            </a>
+            <a href="{{ url_for('inventory.list_departments') }}" class="btn btn-secondary">
+                <i class="fas fa-building"></i> Departamentos
+            </a>
+        </div>
+    </div>
+
+    <!-- Filtros -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <form method="GET" class="row g-3">
+                <div class="col-md-3">
+                    <label class="form-label">Tipo</label>
+                    <select name="type" class="form-select">
+                        <option value="">Todos</option>
+                        <option value="desktop">Desktop</option>
+                        <option value="notebook">Notebook</option>
+                        <option value="printer">Impressora</option>
+                        <option value="scanner">Scanner</option>
+                        <option value="router">Roteador</option>
+                        <option value="switch">Switch</option>
+                        <option value="server">Servidor</option>
+                        <option value="monitor">Monitor</option>
+                        <option value="other">Outro</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Status</label>
+                    <select name="status" class="form-select">
+                        <option value="">Todos</option>
+                        <option value="available">Disponível</option>
+                        <option value="in_use">Em Uso</option>
+                        <option value="maintenance">Em Manutenção</option>
+                        <option value="disposed">Descartado</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Departamento</label>
+                    <select name="department" class="form-select">
+                        <option value="">Todos</option>
+                        {% for dept in departments %}
+                        <option value="{{ dept.id }}">{{ dept.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">&nbsp;</label>
+                    <button type="submit" class="btn btn-primary w-100">Filtrar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Lista de Equipamentos -->
+    <div class="card">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Tipo</th>
+                            <th>Marca/Modelo</th>
+                            <th>Patrimônio</th>
+                            <th>Status</th>
+                            <th>Departamento</th>
+                            <th>Última Atualização</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in equipment %}
+                        <tr>
+                            <td>{{ item.type|title }}</td>
+                            <td>{{ item.brand }} {{ item.model }}</td>
+                            <td>{{ item.patrimony_tag or 'N/A' }}</td>
+                            <td>
+                                {% if item.status == 'available' %}
+                                <span class="badge bg-success">Disponível</span>
+                                {% elif item.status == 'in_use' %}
+                                <span class="badge bg-primary">Em Uso</span>
+                                {% elif item.status == 'maintenance' %}
+                                <span class="badge bg-warning">Em Manutenção</span>
+                                {% else %}
+                                <span class="badge bg-danger">Descartado</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ item.department.name if item.department else 'N/A' }}</td>
+                            <td>{{ item.updated_at.strftime('%d/%m/%Y %H:%M') }}</td>
+                            <td>
+                                <a href="{{ url_for('inventory.view_equipment', id=item.id) }}" 
+                                   class="btn btn-sm btn-info" title="Visualizar">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                                <a href="{{ url_for('inventory.edit_equipment', id=item.id) }}" 
+                                   class="btn btn-sm btn-warning" title="Editar">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <a href="{{ url_for('inventory.add_maintenance', id=item.id) }}" 
+                                   class="btn btn-sm btn-secondary" title="Manutenção">
+                                    <i class="fas fa-tools"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="7" class="text-center">Nenhum equipamento cadastrado.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

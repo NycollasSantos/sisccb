@@ -1,0 +1,123 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-12 mb-4">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{{ url_for('inventory.index') }}">Inventário</a></li>
+                    <li class="breadcrumb-item"><a href="{{ url_for('inventory.view_equipment', id=equipment.id) }}">{{ equipment.brand }} {{ equipment.model }}</a></li>
+                    <li class="breadcrumb-item active">Nova Manutenção</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3>Registrar Manutenção</h3>
+                </div>
+                <div class="card-body">
+                    <form method="POST" class="needs-validation" novalidate>
+                        {{ form.csrf_token }}
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    {{ form.maintenance_type.label(class="form-label") }}
+                                    {{ form.maintenance_type(class="form-select" + (" is-invalid" if form.maintenance_type.errors else "")) }}
+                                    {% if form.maintenance_type.errors %}
+                                    <div class="invalid-feedback">
+                                        {% for error in form.maintenance_type.errors %}
+                                        {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    {{ form.performed_by.label(class="form-label") }}
+                                    {{ form.performed_by(class="form-control" + (" is-invalid" if form.performed_by.errors else "")) }}
+                                    {% if form.performed_by.errors %}
+                                    <div class="invalid-feedback">
+                                        {% for error in form.performed_by.errors %}
+                                        {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    {{ form.performed_at.label(class="form-label") }}
+                                    {{ form.performed_at(class="form-control" + (" is-invalid" if form.performed_at.errors else ""), type="date") }}
+                                    {% if form.performed_at.errors %}
+                                    <div class="invalid-feedback">
+                                        {% for error in form.performed_at.errors %}
+                                        {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    {{ form.next_maintenance.label(class="form-label") }}
+                                    {{ form.next_maintenance(class="form-control" + (" is-invalid" if form.next_maintenance.errors else ""), type="date") }}
+                                    {% if form.next_maintenance.errors %}
+                                    <div class="invalid-feedback">
+                                        {% for error in form.next_maintenance.errors %}
+                                        {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    {{ form.cost.label(class="form-label") }}
+                                    {{ form.cost(class="form-control" + (" is-invalid" if form.cost.errors else ""), type="number", step="0.01") }}
+                                    {% if form.cost.errors %}
+                                    <div class="invalid-feedback">
+                                        {% for error in form.cost.errors %}
+                                        {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            {{ form.description.label(class="form-label") }}
+                            {{ form.description(class="form-control" + (" is-invalid" if form.description.errors else ""), rows="4") }}
+                            {% if form.description.errors %}
+                            <div class="invalid-feedback">
+                                {% for error in form.description.errors %}
+                                {{ error }}
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="form-group">
+                            <button type="submit" class="btn btn-primary">Registrar</button>
+                            <a href="{{ url_for('inventory.view_equipment', id=equipment.id) }}" class="btn btn-secondary">Cancelar</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

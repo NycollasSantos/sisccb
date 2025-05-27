@@ -1,0 +1,109 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <form class="d-flex" action="{{ url_for('knowledge_base.search_articles') }}" method="GET">
+            <input class="form-control me-2" type="search" name="q" placeholder="Pesquisar artigos..." aria-label="Pesquisar">
+            <button class="btn btn-outline-primary" type="submit">Buscar</button>
+        </form>
+        {% if current_user.is_authenticated and current_user.role in ['admin', 'support'] %}
+        <a href="{{ url_for('knowledge_base.new_article') }}" class="btn btn-primary mt-2">
+            <i class="fas fa-plus"></i> Novo Artigo
+        </a>
+        {% endif %}
+    </div>
+</div>
+
+<div class="row">
+    <!-- Categorias -->
+    <div class="col-md-3 mb-4">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">Categorias</h5>
+            </div>
+            <div class="card-body">
+                <div class="list-group">
+                    <a href="{{ url_for('knowledge_base.list_articles') }}" class="list-group-item list-group-item-action active">
+                        Todas as Categorias
+                    </a>
+                    <a href="{{ url_for('knowledge_base.list_articles', category='hardware') }}" class="list-group-item list-group-item-action">
+                        Hardware
+                    </a>
+                    <a href="{{ url_for('knowledge_base.list_articles', category='software') }}" class="list-group-item list-group-item-action">
+                        Software
+                    </a>
+                    <a href="{{ url_for('knowledge_base.list_articles', category='rede') }}" class="list-group-item list-group-item-action">
+                        Rede
+                    </a>
+                    <a href="{{ url_for('knowledge_base.list_articles', category='email') }}" class="list-group-item list-group-item-action">
+                        Email
+                    </a>
+                    <a href="{{ url_for('knowledge_base.list_articles', category='impressora') }}" class="list-group-item list-group-item-action">
+                        Impressora
+                    </a>
+                    <a href="{{ url_for('knowledge_base.list_articles', category='procedimentos') }}" class="list-group-item list-group-item-action">
+                        Procedimentos
+                    </a>
+                    <a href="{{ url_for('knowledge_base.list_articles', category='tutoriais') }}" class="list-group-item list-group-item-action">
+                        Tutoriais
+                    </a>
+                    <a href="{{ url_for('knowledge_base.list_articles', category='faq') }}" class="list-group-item list-group-item-action">
+                        FAQ
+                    </a>
+                    <a href="{{ url_for('knowledge_base.list_articles', category='outros') }}" class="list-group-item list-group-item-action">
+                        Outros
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lista de Artigos -->
+    <div class="col-md-9">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">Artigos</h5>
+            </div>
+            <div class="card-body">
+                {% if articles %}
+                <div class="row">
+                    {% for article in articles %}
+                    <div class="col-md-6 mb-4">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <h5 class="card-title">{{ article.title }}</h5>
+                                <h6 class="card-subtitle mb-2 text-muted">
+                                    <span class="badge bg-info">{{ article.category }}</span>
+                                    {% if article.tags %}
+                                        {% for tag in article.tags.split(',') %}
+                                        <span class="badge bg-secondary">{{ tag.strip() }}</span>
+                                        {% endfor %}
+                                    {% endif %}
+                                </h6>
+                                <p class="card-text">{{ article.content|truncate(150) }}</p>
+                            </div>
+                            <div class="card-footer d-flex justify-content-between align-items-center">
+                                <small class="text-muted">
+                                    Por {{ article.author.name }} em {{ article.created_at.strftime('%d/%m/%Y') }}
+                                </small>
+                                <a href="{{ url_for('knowledge_base.view_article', article_id=article.id) }}" class="btn btn-sm btn-primary">
+                                    Ler mais
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="alert alert-info">
+                    Nenhum artigo encontrado.
+                    {% if current_user.is_authenticated and current_user.role in ['admin', 'support'] %}
+                    <a href="{{ url_for('knowledge_base.new_article') }}">Criar um novo artigo</a>.
+                    {% endif %}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

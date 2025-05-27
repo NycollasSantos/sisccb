@@ -1,0 +1,93 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <h2>Configurações do Sistema</h2>
+                </div>
+                <div class="card-body">
+                    {% if current_user.role == 'admin' %}
+                    <form method="POST" enctype="multipart/form-data">
+                        {{ form.csrf_token }}
+                        
+                        <div class="mb-3">
+                            {{ form.system_name.label(class="form-label") }}
+                            {{ form.system_name(class="form-control", value=settings.system_name) }}
+                            {% if form.system_name.errors %}
+                            <div class="alert alert-danger">
+                                {% for error in form.system_name.errors %}
+                                <span>{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-3">
+                            {{ form.timezone.label(class="form-label") }}
+                            {{ form.timezone(class="form-control", value=settings.timezone) }}
+                            {% if form.timezone.errors %}
+                            <div class="alert alert-danger">
+                                {% for error in form.timezone.errors %}
+                                <span>{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-3">
+                            {{ form.language.label(class="form-label") }}
+                            {{ form.language(class="form-control", value=settings.language) }}
+                            {% if form.language.errors %}
+                            <div class="alert alert-danger">
+                                {% for error in form.language.errors %}
+                                <span>{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-3">
+                            {{ form.date_format.label(class="form-label") }}
+                            {{ form.date_format(class="form-control", value=settings.date_format) }}
+                            {% if form.date_format.errors %}
+                            <div class="alert alert-danger">
+                                {% for error in form.date_format.errors %}
+                                <span>{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-3">
+                            {{ form.system_logo.label(class="form-label") }}
+                            {% if settings.system_logo %}
+                            <div class="mb-2">
+                                <img src="{{ url_for('static', filename='uploads/' + settings.system_logo) }}" alt="Logo atual" class="img-thumbnail" style="max-width: 200px;">
+                            </div>
+                            {% endif %}
+                            {{ form.system_logo(class="form-control") }}
+                            {% if form.system_logo.errors %}
+                            <div class="alert alert-danger">
+                                {% for error in form.system_logo.errors %}
+                                <span>{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <button type="submit" class="btn btn-primary">Salvar Alterações</button>
+                    </form>
+                    {% else %}
+                    <div class="alert alert-warning">
+                        Você não tem permissão para editar as configurações do sistema.
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

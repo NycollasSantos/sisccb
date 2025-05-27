@@ -1,0 +1,89 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="container mt-4">
+    <h1 class="mb-4">Relatório de Chamados</h1>
+    <h4 class="mb-3">Período: {{ start_date.strftime('%d/%m/%Y') }} a {{ end_date.strftime('%d/%m/%Y') }}</h4>
+    
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="card-title mb-0">Resumo</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-3 text-center">
+                    <h3 class="text-primary">{{ stats.total }}</h3>
+                    <p>Total de Chamados</p>
+                </div>
+                <div class="col-md-3 text-center">
+                    <h3 class="text-danger">{{ stats.open }}</h3>
+                    <p>Chamados Abertos</p>
+                </div>
+                <div class="col-md-3 text-center">
+                    <h3 class="text-warning">{{ stats.in_progress }}</h3>
+                    <p>Em Andamento</p>
+                </div>
+                <div class="col-md-3 text-center">
+                    <h3 class="text-success">{{ stats.closed }}</h3>
+                    <p>Chamados Fechados</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <h5 class="card-title mb-0">Detalhamento dos Chamados</h5>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Título</th>
+                            <th>Status</th>
+                            <th>Prioridade</th>
+                            <th>Categoria</th>
+                            <th>Data de Abertura</th>
+                            <th>Última Atualização</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for ticket in tickets %}
+                        <tr>
+                            <td>{{ ticket.id }}</td>
+                            <td>{{ ticket.title }}</td>
+                            <td>
+                                {% if ticket.status == 'aberto' %}
+                                <span class="badge bg-danger">Aberto</span>
+                                {% elif ticket.status == 'em_andamento' %}
+                                <span class="badge bg-warning">Em Andamento</span>
+                                {% elif ticket.status == 'resolvido' %}
+                                <span class="badge bg-success">Resolvido</span>
+                                {% elif ticket.status == 'fechado' %}
+                                <span class="badge bg-secondary">Fechado</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if ticket.priority == 'baixa' %}
+                                <span class="badge bg-info">Baixa</span>
+                                {% elif ticket.priority == 'média' %}
+                                <span class="badge bg-warning">Média</span>
+                                {% elif ticket.priority == 'alta' %}
+                                <span class="badge bg-danger">Alta</span>
+                                {% elif ticket.priority == 'crítica' %}
+                                <span class="badge bg-dark">Crítica</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ ticket.category }}</td>
+                            <td>{{ ticket.created_at.strftime('%d/%m/%Y %H:%M') }}</td>
+                            <td>{{ ticket.updated_at.strftime('%d/%m/%Y %H:%M') }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

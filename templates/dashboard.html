@@ -1,0 +1,284 @@
+{% extends "layout.html" %}
+{% block content %}
+<h1 class="mb-4">Dashboard</h1>
+
+<div class="row">
+    <!-- Cards de estatísticas -->
+    <div class="col-md-3 mb-4">
+        <div class="card border-primary">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h5 class="card-title">Total de Chamados</h5>
+                        <h2 class="display-4">{{ stats.total_tickets }}</h2>
+                    </div>
+                    <i class="fas fa-ticket-alt fa-3x text-primary"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% if current_user.role in ['admin', 'support'] %}
+    <div class="col-md-3 mb-4">
+        <div class="card border-danger">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h5 class="card-title">Chamados Abertos</h5>
+                        <h2 class="display-4">{{ stats.open_tickets }}</h2>
+                    </div>
+                    <i class="fas fa-exclamation-circle fa-3x text-danger"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+    <div class="col-md-3 mb-4">
+        <div class="card border-warning">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h5 class="card-title">Em Andamento</h5>
+                        <h2 class="display-4">{{ stats.in_progress_tickets }}</h2>
+                    </div>
+                    <i class="fas fa-clock fa-3x text-warning"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-4">
+        <div class="card border-success">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h5 class="card-title">Chamados Fechados</h5>
+                        <h2 class="display-4">{{ stats.closed_tickets }}</h2>
+                    </div>
+                    <i class="fas fa-check-circle fa-3x text-success"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Chamados Recentes -->
+<div class="row mt-4">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">Chamados Recentes</h5>
+            </div>
+            <div class="card-body">
+                {% if stats.recent_tickets %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Título</th>
+                                <th>Status</th>
+                                <th>Prioridade</th>
+                                <th>Data</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for ticket in stats.recent_tickets %}
+                            <tr>
+                                <td>{{ ticket.id }}</td>
+                                <td>
+                                    <a href="{{ url_for('tickets.view_ticket', ticket_id=ticket.id) }}">
+                                        {{ ticket.title }}
+                                    </a>
+                                </td>
+                                <td>
+                                    {% if ticket.status == 'aberto' %}
+                                    <span class="badge bg-danger">Aberto</span>
+                                    {% elif ticket.status == 'em_andamento' %}
+                                    <span class="badge bg-warning">Em Andamento</span>
+                                    {% elif ticket.status == 'resolvido' %}
+                                    <span class="badge bg-success">Resolvido</span>
+                                    {% elif ticket.status == 'fechado' %}
+                                    <span class="badge bg-secondary">Fechado</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if ticket.priority == 'baixa' %}
+                                    <span class="badge bg-info">Baixa</span>
+                                    {% elif ticket.priority == 'média' %}
+                                    <span class="badge bg-warning">Média</span>
+                                    {% elif ticket.priority == 'alta' %}
+                                    <span class="badge bg-danger">Alta</span>
+                                    {% elif ticket.priority == 'crítica' %}
+                                    <span class="badge bg-dark">Crítica</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ ticket.created_at.strftime('%d/%m/%Y') }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <a href="{{ url_for('tickets.list_tickets') }}" class="btn btn-sm btn-primary">Ver Todos</a>
+                {% else %}
+                <p class="text-muted">Nenhum chamado encontrado.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Artigos Recentes -->
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0">Artigos Recentes</h5>
+            </div>
+            <div class="card-body">
+                {% if stats.recent_articles %}
+                <ul class="list-group list-group-flush">
+                    {% for article in stats.recent_articles %}
+                    <li class="list-group-item">
+                        <a href="{{ url_for('knowledge_base.view_article', article_id=article.id) }}" class="text-decoration-none">
+                            {{ article.title }}
+                        </a>
+                        <small class="text-muted d-block">{{ article.created_at.strftime('%d/%m/%Y') }}</small>
+                    </li>
+                    {% endfor %}
+                </ul>
+                <div class="mt-3">
+                    <a href="{{ url_for('knowledge_base.list_articles') }}" class="btn btn-sm btn-success">Ver Todos</a>
+                </div>
+                {% else %}
+                <p class="text-muted">Nenhum artigo encontrado.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Gráficos -->
+{% if current_user.role in ['admin', 'support'] %}
+<div class="row mt-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0">Chamados por Categoria</h5>
+            </div>
+            <div class="card-body">
+                <canvas id="categoryChart"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0">Chamados por Status</h5>
+            </div>
+            <div class="card-body">
+                <canvas id="statusChart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    {% if stats.category_stats %}
+    const categoryCtx = document.getElementById('categoryChart').getContext('2d');
+    const total = {{ stats.category_stats|sum(attribute='1') }};
+
+    new Chart(categoryCtx, {
+        type: 'doughnut',
+        data: {
+            labels: [
+                {% for category, count in stats.category_stats %}
+                '{{ category }}',
+                {% endfor %}
+            ],
+            datasets: [{
+                data: [
+                    {% for category, count in stats.category_stats %}
+                    {{ count }},
+                    {% endfor %}
+                ],
+                backgroundColor: [
+                    'rgb(255, 99, 132)',
+                    'rgb(54, 162, 235)',
+                    'rgb(255, 206, 86)',
+                    'rgb(75, 192, 192)',
+                    'rgb(153, 102, 255)'
+                ]
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'bottom'
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            const label = context.label || '';
+                            const value = context.raw;
+                            const percentage = Math.round((value / total) * 100);
+                            return `${label}: ${value} (${percentage}%)`;
+                        }
+                    }
+                }
+            }
+        }
+    });
+    {% endif %}
+
+    {% if stats.status_stats %}
+    const statusCtx = document.getElementById('statusChart').getContext('2d');
+    const statusTotal = {{ stats.status_stats|sum(attribute='1') }};
+
+    new Chart(statusCtx, {
+        type: 'doughnut',
+        data: {
+            labels: [
+                {% for status, count in stats.status_stats %}
+                '{{ status }}',
+                {% endfor %}
+            ],
+            datasets: [{
+                data: [
+                    {% for status, count in stats.status_stats %}
+                    {{ count }},
+                    {% endfor %}
+                ],
+                backgroundColor: [
+                    'rgb(220, 53, 69)', // Danger/Aberto
+                    'rgb(255, 193, 7)', // Warning/Em andamento
+                    'rgb(40, 167, 69)',  // Success/Resolvido
+                    'rgb(108, 117, 125)' // Secondary/Fechado
+                ]
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'bottom'
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            const label = context.label || '';
+                            const value = context.raw;
+                            const percentage = Math.round((value / statusTotal) * 100);
+                            return `${label}: ${value} (${percentage}%)`;
+                        }
+                    }
+                }
+            }
+        }
+    });
+    {% endif %}
+});
+</script>
+{% endblock %}

@@ -1,0 +1,53 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="container mt-4">
+    <h1 class="mb-4">Relatório de Chamados</h1>
+    
+    <div class="card">
+        <div class="card-body">
+            <form method="POST" action="{{ url_for('reports.tickets_report') }}">
+                {{ form.csrf_token }}
+                
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="start_date">Data Inicial</label>
+                            {{ form.start_date(class="form-control") }}
+                            {% if form.start_date.errors %}
+                                {% for error in form.start_date.errors %}
+                                    <span class="text-danger">{{ error }}</span>
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="end_date">Data Final</label>
+                            {{ form.end_date(class="form-control") }}
+                            {% if form.end_date.errors %}
+                                {% for error in form.end_date.errors %}
+                                    <span class="text-danger">{{ error }}</span>
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <button type="submit" class="btn btn-primary">Gerar Relatório</button>
+                    <a href="{{ url_for('reports.report_dashboard') }}" class="btn btn-secondary">Voltar</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize date inputs with date picker if needed
+        // You can add your date picker initialization code here
+    });
+</script>
+{% endblock %}

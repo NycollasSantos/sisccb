@@ -1,0 +1,131 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>Chamados</h1>
+    <a href="{{ url_for('tickets.new_ticket') }}" class="btn btn-primary">
+        <i class="fas fa-plus"></i> Novo Chamado
+    </a>
+</div>
+
+<div class="card">
+    <div class="card-header bg-primary text-white">
+        <h5 class="mb-0">Lista de Chamados</h5>
+    </div>
+    <div class="card-body">
+        <!-- Formulário de Pesquisa -->
+        <form method="GET" action="{{ url_for('tickets.list_tickets') }}" class="mb-4">
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <div class="input-group">
+                        <input type="text" name="search" class="form-control" placeholder="Pesquisar por título ou descrição" value="{{ request.args.get('search', '') }}">
+                        <button class="btn btn-outline-primary" type="submit">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <select name="status" class="form-select" onchange="this.form.submit()">
+                        <option value="" {% if not request.args.get('status') %}selected{% endif %}>Todos os Status</option>
+                        <option value="aberto" {% if request.args.get('status') == 'aberto' %}selected{% endif %}>Aberto</option>
+                        <option value="em_andamento" {% if request.args.get('status') == 'em_andamento' %}selected{% endif %}>Em Andamento</option>
+                        <option value="resolvido" {% if request.args.get('status') == 'resolvido' %}selected{% endif %}>Resolvido</option>
+                        <option value="fechado" {% if request.args.get('status') == 'fechado' %}selected{% endif %}>Fechado</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <a href="{{ url_for('tickets.list_tickets') }}" class="btn btn-outline-secondary w-100">
+                        <i class="fas fa-sync-alt"></i> Limpar
+                    </a>
+                </div>
+            </div>
+        </form>
+        
+        {% if tickets %}
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Título</th>
+                        <th>Categoria</th>
+                        <th>Status</th>
+                        <th>Prioridade</th>
+                        <th>Criado por</th>
+                        <th>Atribuído para</th>
+                        <th>Data</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for ticket in tickets %}
+                    <tr>
+                        <td>{{ ticket.id }}</td>
+                        <td>
+                            <a href="{{ url_for('tickets.view_ticket', ticket_id=ticket.id) }}">
+                                {{ ticket.title }}
+                            </a>
+                        </td>
+                        <td>{{ ticket.category }}</td>
+                        <td>
+                            {% if ticket.status == 'aberto' %}
+                            <span class="badge bg-danger">Aberto</span>
+                            {% elif ticket.status == 'em_andamento' %}
+                            <span class="badge bg-warning">Em Andamento</span>
+                            {% elif ticket.status == 'resolvido' %}
+                            <span class="badge bg-success">Resolvido</span>
+                            {% elif ticket.status == 'fechado' %}
+                            <span class="badge bg-secondary">Fechado</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if ticket.priority == 'baixa' %}
+                            <span class="badge bg-info">Baixa</span>
+                            {% elif ticket.priority == 'média' %}
+                            <span class="badge bg-warning">Média</span>
+                            {% elif ticket.priority == 'alta' %}
+                            <span class="badge bg-danger">Alta</span>
+                            {% elif ticket.priority == 'crítica' %}
+                            <span class="badge bg-dark">Crítica</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ ticket.creator.name }}</td>
+                        <td>
+                            {% if ticket.assigned_to %}
+                            {{ ticket.assigned_to.name }}
+                            {% else %}
+                            <span class="text-muted">Não atribuído</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ ticket.created_at.strftime('%d/%m/%Y') }}</td>
+                        <td>
+                            <div class="btn-group">
+                                <a href="{{ url_for('tickets.view_ticket', ticket_id=ticket.id) }}" class="btn btn-sm btn-info" title="Visualizar">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                                <a href="{{ url_for('tickets.edit_ticket', ticket_id=ticket.id) }}" class="btn btn-sm btn-warning" title="Editar">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                {% if ticket.status != 'fechado' %}
+                                <a href="{{ url_for('tickets.close_ticket', ticket_id=ticket.id) }}" class="btn btn-sm btn-secondary" title="Fechar">
+                                    <i class="fas fa-check"></i>
+                                </a>
+                                {% else %}
+                                <a href="{{ url_for('tickets.reopen_ticket', ticket_id=ticket.id) }}" class="btn btn-sm btn-success" title="Reabrir">
+                                    <i class="fas fa-redo"></i>
+                                </a>
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="alert alert-info">
+            Nenhum chamado encontrado. <a href="{{ url_for('tickets.new_ticket') }}">Criar um novo chamado</a>.
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

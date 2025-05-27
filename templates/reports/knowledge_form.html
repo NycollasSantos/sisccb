@@ -1,0 +1,24 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="container mt-4">
+    <h1 class="mb-4">Relatório da Base de Conhecimento</h1>
+    
+    <div class="card">
+        <div class="card-body">
+            <form method="POST" action="{{ url_for('reports.knowledge_report') }}">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle"></i>
+                    Este relatório irá gerar um documento PDF contendo todos os artigos da base de conhecimento.
+                </div>
+                
+                <div class="form-group">
+                    <button type="submit" class="btn btn-primary">Gerar Relatório</button>
+                    <a href="{{ url_for('reports.report_dashboard') }}" class="btn btn-secondary">Voltar</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

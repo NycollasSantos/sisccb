@@ -1,0 +1,176 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1>Gerenciamento de Usuários</h1>
+            <p class="text-muted">Controle de usuários, permissões e acessos</p>
+        </div>
+        <div class="d-flex">
+            <form class="me-2">
+                <div class="input-group">
+                    <input type="text" class="form-control" placeholder="Buscar..." aria-label="Buscar">
+                    <button class="btn btn-outline-secondary" type="submit">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </div>
+            </form>
+            <div class="dropdown">
+                <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="filterDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                    Todos
+                </button>
+                <ul class="dropdown-menu" aria-labelledby="filterDropdown">
+                    <li><a class="dropdown-item" href="#">Todos</a></li>
+                    <li><a class="dropdown-item" href="#">Administradores</a></li>
+                    <li><a class="dropdown-item" href="#">Técnicos</a></li>
+                    <li><a class="dropdown-item" href="#">Usuários</a></li>
+                </ul>
+            </div>
+        </div>
+        <a href="{{ url_for('users.new_user') }}" class="btn btn-primary">
+            <i class="fas fa-user-plus"></i> Novo Usuário
+        </a>
+    </div>
+
+    <!-- Cards de estatísticas -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-body d-flex justify-content-between align-items-center">
+                    <div>
+                        <h5 class="card-title">Total de Usuários</h5>
+                        <h2 class="display-4">{{ stats.total }}</h2>
+                    </div>
+                    <div class="bg-primary rounded-circle p-3 text-white">
+                        <i class="fas fa-users fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-body d-flex justify-content-between align-items-center">
+                    <div>
+                        <h5 class="card-title">Usuários Ativos</h5>
+                        <h2 class="display-4">{{ stats.active }}</h2>
+                    </div>
+                    <div class="bg-success rounded-circle p-3 text-white">
+                        <i class="fas fa-user-check fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-body d-flex justify-content-between align-items-center">
+                    <div>
+                        <h5 class="card-title">Técnicos</h5>
+                        <h2 class="display-4">{{ stats.support }}</h2>
+                    </div>
+                    <div class="bg-primary rounded-circle p-3 text-white">
+                        <i class="fas fa-headset fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-body d-flex justify-content-between align-items-center">
+                    <div>
+                        <h5 class="card-title">Administradores</h5>
+                        <h2 class="display-4">{{ stats.admin }}</h2>
+                    </div>
+                    <div class="bg-purple rounded-circle p-3 text-white">
+                        <i class="fas fa-user-shield fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tabela de usuários ou mensagem de nenhum usuário -->
+    {% if users %}
+    <div class="card">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nome</th>
+                            <th>Usuário</th>
+                            <th>Email</th>
+                            <th>Departamento</th>
+                            <th>Função</th>
+                            <th>Status</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for user in users %}
+                        <tr>
+                            <td>{{ user.id }}</td>
+                            <td>{{ user.name }}</td>
+                            <td>{{ user.username }}</td>
+                            <td>{{ user.email }}</td>
+                            <td>{{ user.department or '-' }}</td>
+                            <td>
+                                {% if user.role == 'admin' %}
+                                <span class="badge bg-purple">Administrador</span>
+                                {% elif user.role == 'support' %}
+                                <span class="badge bg-primary">Técnico</span>
+                                {% else %}
+                                <span class="badge bg-secondary">Usuário</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if user.active %}
+                                <span class="badge bg-success">Ativo</span>
+                                {% else %}
+                                <span class="badge bg-danger">Inativo</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <div class="btn-group">
+                                    <a href="{{ url_for('users.edit_user', user_id=user.id) }}" class="btn btn-sm btn-outline-primary">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    {% if user.id != current_user.id %}
+                                    <a href="{{ url_for('users.delete_user', user_id=user.id) }}" class="btn btn-sm btn-outline-danger" 
+                                       onclick="return confirm('Tem certeza que deseja excluir este usuário? Esta ação não pode ser desfeita.')">
+                                        <i class="fas fa-trash"></i>
+                                    </a>
+                                    {% endif %}
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="card">
+        <div class="card-body text-center py-5">
+            <div class="mb-4">
+                <i class="fas fa-user-plus fa-5x text-muted"></i>
+            </div>
+            <h3>Nenhum usuário cadastrado</h3>
+            <p class="text-muted">Comece criando o primeiro usuário do sistema</p>
+            <a href="{{ url_for('users.new_user') }}" class="btn btn-primary">
+                <i class="fas fa-user-plus"></i> Criar Primeiro Usuário
+            </a>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block styles %}
+<style>
+.bg-purple {
+    background-color: #6f42c1;
+}
+</style>
+{% endblock %}

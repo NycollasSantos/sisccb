@@ -1,0 +1,102 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>Novo Chamado</h1>
+    <a href="{{ url_for('tickets.list_tickets') }}" class="btn btn-secondary">
+        <i class="fas fa-arrow-left"></i> Voltar
+    </a>
+</div>
+
+<div class="card">
+    <div class="card-header bg-primary text-white">
+        <h5 class="mb-0">Formulário de Chamado</h5>
+    </div>
+    <div class="card-body">
+        <form method="POST" action="" enctype="multipart/form-data">
+            {{ form.hidden_tag() }}
+            <div class="row">
+                <div class="col-md-12 mb-3">
+                    {{ form.title.label(class="form-label") }}
+                    {% if form.title.errors %}
+                        {{ form.title(class="form-control is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in form.title.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.title(class="form-control") }}
+                    {% endif %}
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-4 mb-3">
+                    {{ form.category.label(class="form-label") }}
+                    {% if form.category.errors %}
+                        {{ form.category(class="form-select is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in form.category.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.category(class="form-select") }}
+                    {% endif %}
+                </div>
+                <div class="col-md-4 mb-3">
+                    {{ form.priority.label(class="form-label") }}
+                    {% if form.priority.errors %}
+                        {{ form.priority(class="form-select is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in form.priority.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.priority(class="form-select") }}
+                    {% endif %}
+                </div>
+                <div class="col-md-4 mb-3">
+                    {{ form.assigned_to.label(class="form-label") }}
+                    {% if form.assigned_to.errors %}
+                        {{ form.assigned_to(class="form-select is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in form.assigned_to.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.assigned_to(class="form-select") }}
+                    {% endif %}
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12 mb-3">
+                    {{ form.description.label(class="form-label") }}
+                    {% if form.description.errors %}
+                        {{ form.description(class="form-control is-invalid", rows=6) }}
+                        <div class="invalid-feedback">
+                            {% for error in form.description.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.description(class="form-control", rows=6) }}
+                    {% endif %}
+                    <small class="text-muted">Descreva o problema com o máximo de detalhes possível.</small>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12 mb-3">
+                    {{ form.attachments.label(class="form-label") }}
+                    {{ form.attachments(class="form-control") }}
+                    <small class="text-muted">Você pode anexar múltiplos arquivos (screenshots, documentos, etc).</small>
+                </div>
+            </div>
+            <div class="d-grid">
+                {{ form.submit(class="btn btn-primary") }}
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

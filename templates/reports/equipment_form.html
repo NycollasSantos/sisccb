@@ -1,0 +1,29 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="container mt-4">
+    <h1 class="mb-4">Relatório de Equipamentos</h1>
+    
+    <div class="card">
+        <div class="card-body">
+            <form method="POST" action="{{ url_for('reports.equipment_report') }}">
+                {{ form.csrf_token }}
+                
+                <div class="form-group mb-3">
+                    <label for="department_id">Departamento</label>
+                    {{ form.department_id(class="form-control") }}
+                    {% if form.department_id.errors %}
+                        {% for error in form.department_id.errors %}
+                            <span class="text-danger">{{ error }}</span>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+                
+                <div class="form-group">
+                    <button type="submit" class="btn btn-primary">Gerar Relatório</button>
+                    <a href="{{ url_for('reports.report_dashboard') }}" class="btn btn-secondary">Voltar</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

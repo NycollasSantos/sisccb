@@ -1,0 +1,95 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="container mt-4">
+    <h1 class="mb-4">Relatório de Equipamentos</h1>
+    {% if selected_department %}
+        <h4 class="mb-3">Departamento: {{ departments|selectattr('id', 'equalto', selected_department)|map(attribute='name')|first }}</h4>
+    {% else %}
+        <h4 class="mb-3">Todos os Departamentos</h4>
+    {% endif %}
+
+    <div class="card">
+        <div class="card-header">
+            <h5 class="card-title mb-0">Lista de Equipamentos</h5>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Nome</th>
+                            <th>Modelo</th>
+                            <th>Número de Série</th>
+                            <th>Status</th>
+                            <th>Departamento</th>
+                            <th>Última Manutenção</th>
+                            <th>Próxima Manutenção</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for equipment in equipment_list %}
+                        <tr>
+                            <td>{{ equipment.id }}</td>
+                            <td>{{ equipment.name }}</td>
+                            <td>{{ equipment.model }}</td>
+                            <td>{{ equipment.serial_number }}</td>
+                            <td>
+                                {% if equipment.status == 'ativo' %}
+                                <span class="badge bg-success">Ativo</span>
+                                {% elif equipment.status == 'manutencao' %}
+                                <span class="badge bg-warning">Em Manutenção</span>
+                                {% elif equipment.status == 'inativo' %}
+                                <span class="badge bg-danger">Inativo</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ equipment.department.name }}</td>
+                            <td>
+                                {% if equipment.last_maintenance %}
+                                    {{ equipment.last_maintenance.strftime('%d/%m/%Y') }}
+                                {% else %}
+                                    -
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if equipment.next_maintenance %}
+                                    {{ equipment.next_maintenance.strftime('%d/%m/%Y') }}
+                                {% else %}
+                                    -
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="card mt-4">
+        <div class="card-header">
+            <h5 class="card-title mb-0">Estatísticas</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-3 text-center">
+                    <h3 class="text-primary">{{ equipment_list|length }}</h3>
+                    <p>Total de Equipamentos</p>
+                </div>
+                <div class="col-md-3 text-center">
+                    <h3 class="text-success">{{ equipment_list|selectattr('status', 'equalto', 'ativo')|list|length }}</h3>
+                    <p>Equipamentos Ativos</p>
+                </div>
+                <div class="col-md-3 text-center">
+                    <h3 class="text-warning">{{ equipment_list|selectattr('status', 'equalto', 'manutencao')|list|length }}</h3>
+                    <p>Em Manutenção</p>
+                </div>
+                <div class="col-md-3 text-center">
+                    <h3 class="text-danger">{{ equipment_list|selectattr('status', 'equalto', 'inativo')|list|length }}</h3>
+                    <p>Equipamentos Inativos</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

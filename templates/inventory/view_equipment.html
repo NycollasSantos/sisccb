@@ -1,0 +1,175 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-12 mb-4">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{{ url_for('inventory.index') }}">Inventário</a></li>
+                    <li class="breadcrumb-item active">{{ equipment.brand }} {{ equipment.model }}</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Informações Principais -->
+        <div class="col-md-8">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h3>Informações do Equipamento</h3>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p><strong>Tipo:</strong> {{ equipment.type|title }}</p>
+                            <p><strong>Marca:</strong> {{ equipment.brand }}</p>
+                            <p><strong>Modelo:</strong> {{ equipment.model }}</p>
+                            <p><strong>Nº de Série:</strong> {{ equipment.serial_number or 'N/A' }}</p>
+                            <p><strong>Patrimônio:</strong> {{ equipment.patrimony_tag or 'N/A' }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>Status:</strong> 
+                                {% if equipment.status == 'available' %}
+                                <span class="badge bg-success">Disponível</span>
+                                {% elif equipment.status == 'in_use' %}
+                                <span class="badge bg-primary">Em Uso</span>
+                                {% elif equipment.status == 'maintenance' %}
+                                <span class="badge bg-warning">Em Manutenção</span>
+                                {% else %}
+                                <span class="badge bg-danger">Descartado</span>
+                                {% endif %}
+                            </p>
+                            <p><strong>Departamento:</strong> {{ equipment.department.name if equipment.department else 'N/A' }}</p>
+                            <p><strong>Data de Compra:</strong> {{ equipment.purchase_date.strftime('%d/%m/%Y') if equipment.purchase_date else 'N/A' }}</p>
+                            <p><strong>Garantia até:</strong> {{ equipment.warranty_expiration.strftime('%d/%m/%Y') if equipment.warranty_expiration else 'N/A' }}</p>
+                            <p><strong>Atualizado em:</strong> {{ equipment.updated_at.strftime('%d/%m/%Y %H:%M') }}</p>
+                        </div>
+                    </div>
+                    {% if equipment.notes %}
+                    <div class="row mt-3">
+                        <div class="col-12">
+                            <p><strong>Observações:</strong></p>
+                            <p>{{ equipment.notes|nl2br|safe }}</p>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+                <div class="card-footer">
+                    <a href="{{ url_for('inventory.edit_equipment', id=equipment.id) }}" class="btn btn-warning">
+                        <i class="fas fa-edit"></i> Editar
+                    </a>
+                    <a href="{{ url_for('inventory.add_maintenance', id=equipment.id) }}" class="btn btn-secondary">
+                        <i class="fas fa-tools"></i> Registrar Manutenção
+                    </a>
+                </div>
+            </div>
+
+            <!-- Especificações Técnicas -->
+            <div class="card mb-4">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h3>Especificações Técnicas</h3>
+                    <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#addSpecModal">
+                        <i class="fas fa-plus"></i> Adicionar
+                    </button>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Especificação</th>
+                                    <th>Valor</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for spec in equipment.specifications %}
+                                <tr>
+                                    <td>{{ spec.name }}</td>
+                                    <td>{{ spec.value }}</td>                                    <td>
+                                        <form method="POST" action="{{ url_for('inventory.delete_specification', id=equipment.id, spec_id=spec.id) }}" style="display: inline;">
+                                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                            <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Tem certeza que deseja excluir esta especificação?');">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                                {% else %}
+                                <tr>
+                                    <td colspan="3" class="text-center">Nenhuma especificação cadastrada.</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Histórico de Manutenções -->
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h3>Histórico de Manutenções</h3>
+                </div>
+                <div class="card-body">
+                    <div class="timeline">
+                        {% for record in equipment.maintenance_records|sort(attribute='performed_at', reverse=True) %}
+                        <div class="timeline-item">
+                            <div class="timeline-date">
+                                {{ record.performed_at.strftime('%d/%m/%Y') }}
+                            </div>
+                            <div class="timeline-content">
+                                <h4>{{ record.maintenance_type|title }}</h4>
+                                <p>{{ record.description }}</p>
+                                <p><strong>Realizado por:</strong> {{ record.performed_by }}</p>
+                                {% if record.cost %}
+                                <p><strong>Custo:</strong> R$ {{ "%.2f"|format(record.cost) }}</p>
+                                {% endif %}
+                                {% if record.next_maintenance %}
+                                <p><strong>Próxima Manutenção:</strong> {{ record.next_maintenance.strftime('%d/%m/%Y') }}</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% else %}
+                        <p class="text-center">Nenhum registro de manutenção.</p>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para Adicionar Especificação -->
+<div class="modal fade" id="addSpecModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Adicionar Especificação</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="POST" action="{{ url_for('inventory.add_specification', id=equipment.id) }}">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Nome da Especificação</label>
+                        <input type="text" class="form-control" name="name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Valor</label>
+                        <input type="text" class="form-control" name="value" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Adicionar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

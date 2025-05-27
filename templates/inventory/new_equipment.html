@@ -1,0 +1,180 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-12 mb-4">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{{ url_for('inventory.index') }}">Inventário</a></li>
+                    <li class="breadcrumb-item active">Novo Equipamento</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3>Cadastrar Novo Equipamento</h3>
+                </div>
+                <div class="card-body">
+                    <form method="POST" class="needs-validation" novalidate>
+                        {{ form.csrf_token }}
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    {{ form.type.label(class="form-label") }}
+                                    {{ form.type(class="form-select" + (" is-invalid" if form.type.errors else "")) }}
+                                    {% if form.type.errors %}
+                                    <div class="invalid-feedback">
+                                        {% for error in form.type.errors %}
+                                        {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    {{ form.department_id.label(class="form-label") }}
+                                    {{ form.department_id(class="form-select" + (" is-invalid" if form.department_id.errors else "")) }}
+                                    {% if form.department_id.errors %}
+                                    <div class="invalid-feedback">
+                                        {% for error in form.department_id.errors %}
+                                        {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    {{ form.brand.label(class="form-label") }}
+                                    {{ form.brand(class="form-control" + (" is-invalid" if form.brand.errors else "")) }}
+                                    {% if form.brand.errors %}
+                                    <div class="invalid-feedback">
+                                        {% for error in form.brand.errors %}
+                                        {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    {{ form.model.label(class="form-label") }}
+                                    {{ form.model(class="form-control" + (" is-invalid" if form.model.errors else "")) }}
+                                    {% if form.model.errors %}
+                                    <div class="invalid-feedback">
+                                        {% for error in form.model.errors %}
+                                        {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    {{ form.serial_number.label(class="form-label") }}
+                                    {{ form.serial_number(class="form-control" + (" is-invalid" if form.serial_number.errors else "")) }}
+                                    {% if form.serial_number.errors %}
+                                    <div class="invalid-feedback">
+                                        {% for error in form.serial_number.errors %}
+                                        {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    {{ form.patrimony_tag.label(class="form-label") }}
+                                    {{ form.patrimony_tag(class="form-control" + (" is-invalid" if form.patrimony_tag.errors else "")) }}
+                                    {% if form.patrimony_tag.errors %}
+                                    <div class="invalid-feedback">
+                                        {% for error in form.patrimony_tag.errors %}
+                                        {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    {{ form.status.label(class="form-label") }}
+                                    {{ form.status(class="form-select" + (" is-invalid" if form.status.errors else "")) }}
+                                    {% if form.status.errors %}
+                                    <div class="invalid-feedback">
+                                        {% for error in form.status.errors %}
+                                        {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    {{ form.purchase_date.label(class="form-label") }}
+                                    {{ form.purchase_date(class="form-control" + (" is-invalid" if form.purchase_date.errors else ""), type="date") }}
+                                    {% if form.purchase_date.errors %}
+                                    <div class="invalid-feedback">
+                                        {% for error in form.purchase_date.errors %}
+                                        {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    {{ form.warranty_expiration.label(class="form-label") }}
+                                    {{ form.warranty_expiration(class="form-control" + (" is-invalid" if form.warranty_expiration.errors else ""), type="date") }}
+                                    {% if form.warranty_expiration.errors %}
+                                    <div class="invalid-feedback">
+                                        {% for error in form.warranty_expiration.errors %}
+                                        {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            {{ form.notes.label(class="form-label") }}
+                            {{ form.notes(class="form-control" + (" is-invalid" if form.notes.errors else ""), rows="3") }}
+                            {% if form.notes.errors %}
+                            <div class="invalid-feedback">
+                                {% for error in form.notes.errors %}
+                                {{ error }}
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="form-group">
+                            <button type="submit" class="btn btn-primary">Salvar</button>
+                            <a href="{{ url_for('inventory.index') }}" class="btn btn-secondary">Cancelar</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

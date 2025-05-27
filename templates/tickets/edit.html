@@ -1,0 +1,137 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>Editar Chamado #{{ ticket.id }}</h1>
+    <div>
+        <a href="{{ url_for('tickets.view_ticket', ticket_id=ticket.id) }}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Voltar
+        </a>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header bg-primary text-white">
+        <h5 class="mb-0">Formulário de Chamado</h5>
+    </div>
+    <div class="card-body">
+        <form method="POST" action="" enctype="multipart/form-data">
+            {{ form.hidden_tag() }}
+            <div class="row">
+                <div class="col-md-12 mb-3">
+                    {{ form.title.label(class="form-label") }}
+                    {% if form.title.errors %}
+                        {{ form.title(class="form-control is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in form.title.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.title(class="form-control") }}
+                    {% endif %}
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-3 mb-3">
+                    {{ form.category.label(class="form-label") }}
+                    {% if form.category.errors %}
+                        {{ form.category(class="form-select is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in form.category.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.category(class="form-select") }}
+                    {% endif %}
+                </div>
+                <div class="col-md-3 mb-3">
+                    {{ form.priority.label(class="form-label") }}
+                    {% if form.priority.errors %}
+                        {{ form.priority(class="form-select is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in form.priority.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.priority(class="form-select") }}
+                    {% endif %}
+                </div>
+                <div class="col-md-3 mb-3">
+                    {{ form.status.label(class="form-label") }}
+                    {% if form.status.errors %}
+                        {{ form.status(class="form-select is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in form.status.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.status(class="form-select") }}
+                    {% endif %}
+                </div>
+                <div class="col-md-3 mb-3">
+                    {{ form.assigned_to.label(class="form-label") }}
+                    {% if form.assigned_to.errors %}
+                        {{ form.assigned_to(class="form-select is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in form.assigned_to.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.assigned_to(class="form-select") }}
+                    {% endif %}
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12 mb-3">
+                    {{ form.description.label(class="form-label") }}
+                    {% if form.description.errors %}
+                        {{ form.description(class="form-control is-invalid", rows=6) }}
+                        <div class="invalid-feedback">
+                            {% for error in form.description.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.description(class="form-control", rows=6) }}
+                    {% endif %}
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12 mb-3">
+                    {{ form.attachments.label(class="form-label") }}
+                    {{ form.attachments(class="form-control") }}
+                    <small class="text-muted">Você pode anexar arquivos adicionais.</small>
+                </div>
+            </div>
+            
+            {% if ticket.attachments %}
+            <div class="row mb-3">
+                <div class="col-12">
+                    <label class="form-label">Anexos Existentes:</label>
+                    <ul class="list-group">
+                        {% for attachment in ticket.attachments %}
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <span>
+                                <i class="fas fa-paperclip"></i> {{ attachment.filename }}
+                            </span>
+                            <a href="{{ url_for('static', filename='uploads/' + attachment.filepath) }}" class="btn btn-sm btn-primary" target="_blank">
+                                <i class="fas fa-download"></i> Download
+                            </a>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+            {% endif %}
+            
+            <div class="d-grid">
+                {{ form.submit(class="btn btn-primary") }}
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
