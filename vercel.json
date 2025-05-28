@@ -2,7 +2,7 @@
   "version": 2,
   "builds": [
     {
-      "src": "wsgi.py",
+      "src": "vercel_wsgi.py",
       "use": "@vercel/python",
       "config": {
         "maxLambdaSize": "15mb",
@@ -19,14 +19,14 @@
     {
       "src": "/static/(.*)",
       "dest": "/static/$1"
-    },
-    {
+    },    {
       "src": "/(.*)",
-      "dest": "/wsgi.py"
+      "dest": "/vercel_wsgi.py"
     }
   ],
   "env": {
-    "FLASK_APP": "run.py",
-    "FLASK_ENV": "production"
+    "FLASK_APP": "vercel_wsgi.py",
+    "FLASK_ENV": "production",
+    "PYTHONPATH": "."
   }
 }
