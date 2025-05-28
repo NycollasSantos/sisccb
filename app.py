@@ -1,3 +1,4 @@
+import os
 from flask import Flask, render_template
 from config import Config
 from extensions import db, login_manager, migrate, bcrypt, csrf
@@ -14,7 +15,9 @@ from datetime import datetime
 import re  # Adicione esta importação para o filtro nl2br
 
 def create_app(config_class=Config):
-    app = Flask(__name__)
+    # Configure instance path for Vercel
+    instance_path = '/tmp' if os.environ.get('VERCEL') else None
+    app = Flask(__name__, instance_path=instance_path)
     app.config.from_object(config_class)
     
     # Inicializar extensões

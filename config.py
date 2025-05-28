@@ -11,7 +11,11 @@ class Config:
     if database_url and database_url.startswith("postgres://"):
         database_url = database_url.replace("postgres://", "postgresql://", 1)
     
-    SQLALCHEMY_DATABASE_URI = database_url or 'sqlite:///sisccb.db'
+    # Use /tmp in Vercel environment for SQLite
+    if os.environ.get('VERCEL'):
+        SQLALCHEMY_DATABASE_URI = database_url or 'sqlite:////tmp/sisccb.db'
+    else:
+        SQLALCHEMY_DATABASE_URI = database_url or 'sqlite:///sisccb.db'
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     
     # Use /tmp for uploads in serverless environment
